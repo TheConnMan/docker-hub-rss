@@ -41,7 +41,7 @@ function formatRSS(repo, user, images) {
     feed.item({
       title: repo.user + '/' + repo.name + ':' + image.name,
       url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
-      guid: image.id,
+      guid: image.id + '-' + new Date(image.last_updated).getTime(),
       date: new Date(image.last_updated)
     });
   });
