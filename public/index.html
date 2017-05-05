@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <title>Docker Hub RSS</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css">
+  </head>
+  <body ng-controller="controller">
+    <div class="ui segment">
+      <h1 class="ui header">
+        <i class="feed icon"></i>
+        <div class="content">
+          Docker Hub RSS
+          <div class="sub header">RSS feed for Docker Hub images</div>
+        </div>
+      </h1>
+    </div>
+    <div class="ui segment" style="max-width: 800px; margin: 0 auto;">
+      <h2 class="ui dividing header">Try It Out</h2>
+      <form class="ui form">
+        <div class="field">
+          <div class="three fields">
+            <div class="field">
+              <label>Docker Hub User</label>
+              <input type="text" ng-model="user">
+            </div>
+            <div class="field">
+              <label>Docker Hub Repository</label>
+              <input type="text"  ng-model="repo">
+            </div>
+            <div class="field">
+              <label>Submit</label>
+              <button class="ui primary button" ng-click="fetchFeed()">Preview Feed</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <h2 class="ui dividing header">Preview</h2>
+      <div class="ui feed" ng-if="feed">
+        <h3 class="ui header">
+          <img ng-if="feed.image && feed.image.url" class="ui image" ng-src="{{feed.image.url}}">
+          <div class="content">
+            <a ng-href="feed.link">{{feed.title}}</a>
+            <div class="sub header" ng-if="feed.description">{{feed.description}}</div>
+          </div>
+        </h3>
+        <div class="ui large feed">
+          <div class="event" ng-repeat="item in feed.item | orderBy:'+': item.pubDate track by $index">
+            <div class="label">
+              <i class="tag icon"></i>
+            </div>
+            <div class="content">
+              <div class="summary">
+                {{item.title}}
+                <span class="date" am-time-ago="item.pubDate"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.9/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-moment/1.0.1/angular-moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/x2js/1.2.0/xml2json.min.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

@@ -1,7 +1,10 @@
 var dockerHubAPI = require('docker-hub-api');
 var RSS = require('rss');
 var express = require('express');
+
 var app = express();
+
+app.use(express.static('public'));
 
 app.get('/:username/:repository.atom', function (req, res) {
   var username = req.params.username;
