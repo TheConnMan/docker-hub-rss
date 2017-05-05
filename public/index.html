@@ -36,7 +36,7 @@
         </div>
       </form>
       <h2 class="ui dividing header">Preview</h2>
-      <div class="ui feed" ng-if="feed">
+      <div class="ui feed" ng-if="feed && !loading && !error">
         <h3 class="ui header">
           <img ng-if="feed.image && feed.image.url" class="ui image" ng-src="{{feed.image.url}}">
           <div class="content">
@@ -58,6 +58,19 @@
           </div>
         </div>
       </div>
+      <h1 class="ui icon header" ng-if="loading" style="margin: 0 auto; display: block;">
+        <i class="circle notched loading icon"></i>
+        <div class="content">
+          Loading
+        </div>
+      </h1>
+      <h1 class="ui icon header" ng-if="error" style="margin: 0 auto; display: block;">
+        <i class="bug icon"></i>
+        <div class="content">
+          An error occured
+          <div class="sub header">Please check the Docker Hub username and repository</div>
+        </div>
+      </h1>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>

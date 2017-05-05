@@ -5,6 +5,8 @@ app.controller('controller', function($scope, $http) {
   $scope.repo = 'docker-hub-rss';
 
   $scope.fetchFeed = function() {
+    $scope.loading = true;
+    $scope.error = false;
     $http({
       url: '/' + $scope.user + '/' + $scope.repo + '.atom',
       transformResponse: function(data) {
@@ -12,6 +14,10 @@ app.controller('controller', function($scope, $http) {
       }
     }).then(data => {
       $scope.feed = data.data.rss.channel;
+      $scope.loading = false;
+    }).catch(error => {
+      $scope.loading = false;
+      $scope.error = true;
     });
   };
 
