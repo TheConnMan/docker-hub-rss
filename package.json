@@ -1,0 +1,20 @@
+{
+  "name": "docker-hub-rss",
+  "version": "0.1.0",
+  "description": "RSS feed for Docker Hub images",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "TheConnMan",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TheConnMan/docker-hub-rss.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "docker-hub-api": "^0.5.1",
+    "express": "^4.15.2",
+    "rss": "^1.2.2"
+  }
+}
