@@ -1,5 +1,24 @@
 var dockerHubAPI = require('docker-hub-api');
 var RSS = require('rss');
+
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
+
+if (process.env.FLUENTD_HOST) {
+  var tags = (process.env.FLUENTD_TAGS ? process.env.FLUENTD_TAGS.split(',') : []).reduce((allTags, tag) => {
+    var pair = tag.split(':');
+    allTags[pair[0].trim()] = pair.length === 1 ? true : pair[1].trim();
+    return allTags;
+  }, {});
+  tags.function = 'DockerHubRSS';
+  log4js.addAppender(require('fluent-logger').support.log4jsAppender('docker-hub-rss', {
+    host: process.env.FLUENTD_HOST,
+    timeout: 3.0,
+    tags: tags
+  }));
+}
+
 var express = require('express');
 
 var app = express();
@@ -13,6 +32,7 @@ app.get('/:username/:repository.atom', function (req, res) {
     res.notFound();
   } else {
     var data = {};
+    logger.info('RSS request for ' + username + '/' + repository);
     dockerHubAPI.repository(username, repository).then(repo => {
       data.repo = repo;
       return dockerHubAPI.user(username);

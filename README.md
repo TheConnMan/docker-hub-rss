@@ -20,3 +20,8 @@ cd docker-hub-rss
 npm install
 npm start
 ```
+
+## Environment Variables
+
+- **FLUENTD_HOST** (Optional) Fluent host for logging
+- **FLUENTD_TAGS** (Optional) Add FluentD context tags (format is tag:value,tag2:value2)
