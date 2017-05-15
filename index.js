@@ -28,6 +28,8 @@ app.use(express.static('public'));
 app.get('/:username/:repository.atom', function (req, res) {
   var username = req.params.username;
   var repository = req.params.repository;
+  var include = req.query.include ? req.query.include.split(',') : [];
+  var exclude = req.query.exclude ? req.query.exclude.split(',') : [];
   if (!username || !repository) {
     res.notFound();
   } else {
@@ -40,10 +42,13 @@ app.get('/:username/:repository.atom', function (req, res) {
       data.user = user;
       return dockerHubAPI.tags(username, repository, {perPage: 20});
     }).then(images => {
+      var filtered = (images.results || images).filter(image => {
+        return (include.length === 0 || include.indexOf(image.name) !== -1) && (exclude.length === 0 || exclude.indexOf(image.name) === -1);
+      });
       res.set('Content-Type', 'text/xml');
-      res.send(formatRSS(data.repo, data.user, images));
+      res.send(formatRSS(data.repo, data.user, filtered));
     }).catch(e => {
-      console.log(e);
+      logger.error(e);
       res.sendStatus(500);
     });
   }
@@ -60,7 +65,7 @@ function formatRSS(repo, user, images) {
     site_url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
     image_url: user.gravatar_url
   });
-  (images.results || images).forEach(image => {
+  images.forEach(image => {
     feed.item({
       title: repo.user + '/' + repo.name + ':' + image.name,
       url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
