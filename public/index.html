@@ -50,7 +50,7 @@
         <h3 class="ui header">
           <img ng-if="feed.image && feed.image.url" class="ui image" ng-src="{{feed.image.url}}">
           <div class="content">
-            <a ng-href="feed.link">{{feed.title}}</a>
+            <a ng-href="{{feed.link}}">{{feed.title}}</a>
             <div class="sub header" ng-if="feed.description">{{feed.description}}</div>
           </div>
         </h3>
