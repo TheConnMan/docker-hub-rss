@@ -7,6 +7,7 @@ app.controller('controller', function($scope, $http) {
   $scope.fetchFeed = function() {
     $scope.loading = true;
     $scope.error = false;
+    $scope.url = '';
     $http({
       url: '/' + $scope.user + '/' + $scope.repo + '.atom',
       params: {
@@ -16,11 +17,18 @@ app.controller('controller', function($scope, $http) {
       transformResponse: function(data) {
         return new X2JS().xml_str2json(data);
       }
-    }).then(data => {
-      if (!Array.isArray(data.data.rss.channel.item)) {
-        data.data.rss.channel.item = [data.data.rss.channel.item];
+    }).then(({data, status, headers, config}) => {
+      if (!Array.isArray(data.rss.channel.item)) {
+        data.rss.channel.item = [data.rss.channel.item];
       }
-      $scope.feed = data.data.rss.channel;
+      $scope.feed = data.rss.channel;
+      var queryParams = Object.keys(config.params || {}).reduce((array, key) => {
+        if (config.params[key]) {
+          array.push(key + '=' + config.params[key]);
+        }
+        return array;
+      }, []);
+      $scope.url = window.location.origin + config.url + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
       $scope.loading = false;
     }).catch(error => {
       $scope.loading = false;

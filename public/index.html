@@ -46,6 +46,8 @@
         </div>
       </form>
       <h2 class="ui dividing header">Preview</h2>
+      This feed: <a ng-href="{{url}}">{{url}}</a>
+      <div class="ui divider"></div>
       <div class="ui feed" ng-if="feed && !loading && !error">
         <h3 class="ui header">
           <img ng-if="feed.image && feed.image.url" class="ui image" ng-src="{{feed.image.url}}">
