@@ -1,8 +1,10 @@
 var app = angular.module('app', ['angularMoment']);
-app.controller('controller', function($scope, $http) {
+app.controller('controller', function($scope, $http, $location) {
 
-  $scope.user = 'TheConnMan';
-  $scope.repo = 'docker-hub-rss';
+  $scope.user = $location.search().user || 'TheConnMan';
+  $scope.repo = $location.search().repo || 'docker-hub-rss';
+  $scope.include = $location.search().include;
+  $scope.exclude = $location.search().exclude;
 
   $scope.fetchFeed = function() {
     $scope.loading = true;
@@ -30,6 +32,12 @@ app.controller('controller', function($scope, $http) {
       }, []);
       $scope.url = window.location.origin + config.url + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
       $scope.loading = false;
+      $location.search({
+        user: $scope.user,
+        repo: $scope.repo,
+        include: $scope.include,
+        exclude: $scope.exclude
+      })
     }).catch(error => {
       $scope.loading = false;
       $scope.error = true;
