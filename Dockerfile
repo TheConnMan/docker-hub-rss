@@ -1,14 +1,11 @@
-FROM alpine:3.4
+FROM node:8.1-alpine
 
-RUN apk add --no-cache nodejs
+WORKDIR /app
 
-WORKDIR /usr/src/app
-
-COPY package.json /usr/src/app
+COPY package.json /app
 RUN npm install
 
-COPY . /usr/src/app
+COPY . /app
 
 EXPOSE 3000
-
 CMD npm start
