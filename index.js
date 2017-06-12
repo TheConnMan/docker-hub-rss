@@ -28,8 +28,8 @@ app.get('/:username/:repository.atom', function (req, res) {
   }
 });
 
-app.listen(3000, function () {
-  console.log('Docker RSS Feed lisening on port 3000!');
+app.listen(80, function () {
+  console.log('Docker RSS Feed lisening on port 80!');
 });
 
 function formatRSS(repo, user, images) {
