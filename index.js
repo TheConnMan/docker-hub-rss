@@ -3,6 +3,8 @@ var RSS = require('rss');
 var express = require('express');
 var app = express();
 
+var regex_exclude = process.env.DOCKER_HUB_RSS_REGEX_EXCLUDE || false;
+
 app.get('/:username/:repository.atom', function (req, res) {
   var username = req.params.username;
   var repository = req.params.repository;
@@ -38,8 +40,12 @@ function formatRSS(repo, user, images) {
     image_url: user.gravatar_url
   });
   (images.results || images).forEach(image => {
+    var image = repo.user + '/' + repo.name + ':' + image.name;
+    if(regex_exclude && image.match(regex_exclude)){
+      return;
+    }
     feed.item({
-      title: repo.user + '/' + repo.name + ':' + image.name,
+      title: image,
       url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
       guid: image.id + '-' + new Date(image.last_updated).getTime(),
       date: new Date(image.last_updated)
