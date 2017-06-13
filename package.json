@@ -1,6 +1,6 @@
 {
   "name": "docker-hub-rss",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "RSS feed for Docker Hub images",
   "main": "index.js",
   "scripts": {
