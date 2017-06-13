@@ -4,6 +4,10 @@
 
 RSS feed for Docker Hub images
 
+## Why?
+
+Docker Hub doesn't provide notifications for new image releases, so **Docker Hub RSS** turns image tags into an RSS feed for easy consumption. Subscribe using [Slack RSS](https://slack.com/apps/new/A0F81R7U7-rss), [Feedly](https://feedly.com/), or any other RSS feed reader to get notified when a new image is published.
+
 ## Quickstart
 
 Run with Docker by executing: `docker run -d -p 3000:3000 --name=docker-hub-rss theconnman/docker-hub-rss:latest`
@@ -20,3 +24,8 @@ cd docker-hub-rss
 npm install
 npm start
 ```
+
+## Environment Variables
+
+- **FLUENTD_HOST** (Optional) Fluent host for logging
+- **FLUENTD_TAGS** (Optional) Add FluentD context tags (format is tag:value,tag2:value2)
