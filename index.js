@@ -4,7 +4,6 @@ var RSS = require('rss');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
-
 if (process.env.FLUENTD_HOST) {
   var tags = (process.env.FLUENTD_TAGS ? process.env.FLUENTD_TAGS.split(',') : []).reduce((allTags, tag) => {
     var pair = tag.split(':');
@@ -19,13 +18,29 @@ if (process.env.FLUENTD_HOST) {
   }));
 }
 
+var SDC = require('statsd-client');
+
+var tags = (process.env.STATSD_TAGS ? process.env.STATSD_TAGS.split(',') : []).reduce((allTags, tag) => {
+  var pair = tag.split(':');
+  allTags[pair[0].trim()] = pair.length === 1 ? true : pair[1].trim();
+  return allTags;
+}, {});
+
+var statsd = new SDC({
+  host: process.env.STATSD_HOST || 'localhost',
+  tags: tags
+});
+
 var express = require('express');
 
 var app = express();
 
 app.use(express.static('public'));
 
+app.use(statsd.helpers.getExpressMiddleware('rss'));
+
 app.get('/:username/:repository.atom', function (req, res) {
+  statsd.increment('rss.request.count');
   var username = req.params.username;
   var repository = req.params.repository;
   var include = req.query.include ? req.query.include.split(',') : [];

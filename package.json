@@ -17,6 +17,7 @@
     "express": "^4.15.2",
     "fluent-logger": "github:theconnman/fluent-logger-node",
     "log4js": "^1.1.1",
-    "rss": "^1.2.2"
+    "rss": "^1.2.2",
+    "statsd-client": "^0.4.0"
   }
 }
