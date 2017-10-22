@@ -40,7 +40,7 @@ app.get('/:username/:repository.atom', function (req, res) {
       return dockerHubAPI.user(username);
     }).then(user => {
       data.user = user;
-      return dockerHubAPI.tags(username, repository, {perPage: 20});
+      return dockerHubAPI.tags(username, repository);
     }).then(images => {
       var filtered = (images.results || images).filter(image => {
         return (include.length === 0 || include.indexOf(image.name) !== -1) && (exclude.length === 0 || exclude.indexOf(image.name) === -1);
