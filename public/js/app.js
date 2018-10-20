@@ -5,6 +5,8 @@ app.controller('controller', function($scope, $http, $location) {
   $scope.repo = $location.search().repo || 'docker-hub-rss';
   $scope.include = $location.search().include;
   $scope.exclude = $location.search().exclude;
+  $scope.includeRegex = $location.search().includeRegex;
+  $scope.excludeRegex = $location.search().excludeRegex;
 
   $scope.fetchFeed = function() {
     $scope.loading = true;
@@ -14,7 +16,9 @@ app.controller('controller', function($scope, $http, $location) {
       url: '/' + $scope.user + '/' + $scope.repo + '.atom',
       params: {
         include: $scope.include,
-        exclude: $scope.exclude
+        exclude: $scope.exclude,
+        includeRegex: $scope.includeRegex,
+        excludeRegex: $scope.excludeRegex
       },
       transformResponse: function(data) {
         return new X2JS().xml_str2json(data);
@@ -36,7 +40,9 @@ app.controller('controller', function($scope, $http, $location) {
         user: $scope.user,
         repo: $scope.repo,
         include: $scope.include,
-        exclude: $scope.exclude
+        exclude: $scope.exclude,
+        includeRegex: $scope.includeRegex,
+        excludeRegex: $scope.excludeRegex
       })
     }).catch(error => {
       $scope.loading = false;

@@ -44,7 +44,9 @@ app.get('/:username/:repository.atom', function (req, res) {
   var username = req.params.username;
   var repository = req.params.repository;
   var include = req.query.include ? req.query.include.split(',') : [];
+  var includeRegex = req.query.includeRegex;
   var exclude = req.query.exclude ? req.query.exclude.split(',') : [];
+  var excludeRegex = req.query.excludeRegex;
   if (!username || !repository) {
     res.notFound();
   } else {
@@ -58,7 +60,10 @@ app.get('/:username/:repository.atom', function (req, res) {
       return dockerHubAPI.tags(username, repository);
     }).then(images => {
       var filtered = (images.results || images).filter(image => {
-        return (include.length === 0 || include.indexOf(image.name) !== -1) && (exclude.length === 0 || exclude.indexOf(image.name) === -1);
+        return (include.length === 0 || include.indexOf(image.name) !== -1) &&
+          (exclude.length === 0 || exclude.indexOf(image.name) === -1) &&
+          (!includeRegex || image.name.match(new RegExp(includeRegex))) &&
+          (!excludeRegex || !image.name.match(new RegExp(excludeRegex)));
       });
       res.set('Content-Type', 'text/xml');
       res.send(formatRSS(data.repo, data.user, filtered));
