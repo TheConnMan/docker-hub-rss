@@ -21,8 +21,8 @@ To develop locally run the following:
 ```bash
 git clone https://github.com/TheConnMan/docker-hub-rss.git
 cd docker-hub-rss
-npm install
-npm start
+yarn install
+yarn start
 ```
 
 ## Environment Variables
