@@ -30,7 +30,7 @@ app.controller('controller', function($scope, $http, $location) {
       $scope.feed = data.rss.channel;
       var queryParams = Object.keys(config.params || {}).reduce((array, key) => {
         if (config.params[key]) {
-          array.push(key + '=' + config.params[key]);
+          array.push(key + '=' + encodeURIComponent(config.params[key]));
         }
         return array;
       }, []);
