@@ -21,11 +21,13 @@ To develop locally run the following:
 ```bash
 git clone https://github.com/TheConnMan/docker-hub-rss.git
 cd docker-hub-rss
-npm install
-npm start
+yarn install
+yarn start
 ```
 
 ## Environment Variables
 
 - **FLUENTD_HOST** (Optional) Fluent host for logging
 - **FLUENTD_TAGS** (Optional) Add FluentD context tags (format is tag:value,tag2:value2)
+- STATSD_HOST (default: localhost) - StatsD hostname
+- STATSD_TAGS (Optional) - StatsD tags

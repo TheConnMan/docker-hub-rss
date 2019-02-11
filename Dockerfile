@@ -4,11 +4,12 @@ RUN apk add --no-cache git
 
 WORKDIR /app
 
+COPY yarn.lock /app
 COPY package.json /app
-RUN npm install
+RUN yarn install
 
 COPY . /app
 
 EXPOSE 3000
 
-CMD npm start
+CMD yarn start

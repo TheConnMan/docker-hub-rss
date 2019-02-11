@@ -38,20 +38,30 @@
               <input type="text"  ng-model="exclude" placeholder="latest,latest-dev">
             </div>
           </div>
-            <div class="three fields">
-              <div class="field">
-                <label>Docker Hub User</label>
-                <input type="text" ng-model="user">
-              </div>
-              <div class="field">
-                <label>Docker Hub Repository</label>
-                <input type="text"  ng-model="repo">
-              </div>
-              <div class="field">
-                <label>Submit</label>
-                <button class="ui primary button" ng-click="fetchFeed()">Preview Feed</button>
-              </div>
+          <div class="two fields">
+            <div class="field">
+              <label>Include Regex</label>
+              <input type="text" ng-model="includeRegex" placeholder="v.*">
             </div>
+            <div class="field">
+              <label>Exclude Regex</label>
+              <input type="text"  ng-model="excludeRegex" placeholder=".*-dev">
+            </div>
+          </div>
+          <div class="three fields">
+            <div class="field">
+              <label>Docker Hub User</label>
+              <input type="text" ng-model="user">
+            </div>
+            <div class="field">
+              <label>Docker Hub Repository</label>
+              <input type="text"  ng-model="repo">
+            </div>
+            <div class="field">
+              <label>Submit</label>
+              <button class="ui primary button" ng-click="fetchFeed()">Preview Feed</button>
+            </div>
+          </div>
         </div>
       </form>
       <h2 class="ui dividing header">Preview</h2>

@@ -1,6 +1,6 @@
 {
   "name": "docker-hub-rss",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "RSS feed for Docker Hub images",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "express": "^4.15.2",
     "fluent-logger": "github:theconnman/fluent-logger-node",
     "log4js": "^1.1.1",
-    "rss": "^1.2.2"
+    "rss": "^1.2.2",
+    "statsd-client": "^0.4.0"
   }
 }
