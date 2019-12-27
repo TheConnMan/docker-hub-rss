@@ -57,9 +57,9 @@ app.get('/:username/:repository.atom', function (req, res) {
       return dockerHubAPI.user(username);
     }).then(user => {
       data.user = user;
-      return dockerHubAPI.tags(username, repository);
+      return getAllTags(username, repository);
     }).then(images => {
-      var filtered = (images.results || images).filter(image => {
+      var filtered = images.filter(image => {
         return (include.length === 0 || include.indexOf(image.name) !== -1) &&
           (exclude.length === 0 || exclude.indexOf(image.name) === -1) &&
           (!includeRegex || image.name.match(new RegExp(includeRegex))) &&
@@ -73,6 +73,21 @@ app.get('/:username/:repository.atom', function (req, res) {
     });
   }
 });
+
+function getAllTags(username, repository) {
+  return getTagsRecursive(username, repository, 1, []);
+}
+
+function getTagsRecursive(username, repository, page, tags) {
+  return dockerHubAPI.tags(username, repository, {
+    page
+  }).then(tagsPage => {
+    if ((tagsPage.results || tagsPage).length === 0) {
+      return Promise.resolve(tags);
+    }
+    return getTagsRecursive(username, repository, page + 1, tags.concat((tagsPage.results || tagsPage)));
+  });
+}
 
 app.listen(3000, function () {
   console.log('Docker RSS Feed lisening on port 3000!');
