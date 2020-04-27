@@ -90,7 +90,7 @@ function getTagsRecursive(username, repository, page, tags) {
 }
 
 app.listen(3000, function () {
-  console.log('Docker RSS Feed lisening on port 3000!');
+  console.log('Docker RSS Feed listening on port 3000!');
 });
 
 function formatRSS(repo, user, images) {
