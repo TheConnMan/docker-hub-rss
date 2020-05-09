@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "docker-hub-api": "^0.5.1",
+    "docker-hub-api": "^0.8.0",
     "express": "^4.15.2",
     "fluent-logger": "github:theconnman/fluent-logger-node",
     "log4js": "^1.1.1",
