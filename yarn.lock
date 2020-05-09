@@ -158,10 +158,10 @@ destroy@~1.0.4:
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
   integrity sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA=
 
-docker-hub-api@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/docker-hub-api/-/docker-hub-api-0.5.1.tgz#324f56f6baac1ee3bb479e038e41bfe6ab91e234"
-  integrity sha1-Mk9W9rqsHuO7R54DjkG/5quR4jQ=
+docker-hub-api@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/docker-hub-api/-/docker-hub-api-0.8.0.tgz#686af54cb219215cfb7e1e5a880439207754e99b"
+  integrity sha512-wVDysVkW3ahSyU/CXD5SnbjyTvgNo0QzQ2tBdfyB83oEAvmCloCxWMHBkz+y4AZ/HNLuqN4BsTxbOs6WYzvtqQ==
   dependencies:
     lodash "^3.10.1"
     request "^2.67.0"
