@@ -14,6 +14,7 @@ app.controller('controller', function($scope, $http, $location) {
     $scope.url = '';
     $http({
       url: '/' + $scope.user + '/' + $scope.repo + '.atom',
+      urlAlt: '/r/' + $scope.user + '/' + $scope.repo,
       params: {
         include: $scope.include,
         exclude: $scope.exclude,
@@ -35,6 +36,7 @@ app.controller('controller', function($scope, $http, $location) {
         return array;
       }, []);
       $scope.url = window.location.origin + config.url + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
+      $scope.urlAlt = window.location.origin + config.urlAlt + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
       $scope.loading = false;
       $location.search({
         user: $scope.user,
