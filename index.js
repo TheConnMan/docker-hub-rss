@@ -39,6 +39,11 @@ app.use(express.static('public'));
 
 app.use(statsd.helpers.getExpressMiddleware('rss'));
 
+
+app.get('/r/:username/:repository', function (req, res) {
+  res.redirect(`/${req.params.username}/${req.params.repository}.atom`);
+});
+
 app.get('/:username/:repository.atom', function (req, res) {
   statsd.increment('rss.request.count');
   var username = req.params.username;
