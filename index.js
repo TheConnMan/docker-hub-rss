@@ -100,7 +100,7 @@ app.listen(3000, function () {
 
 function formatRSS(repo, user, images) {
   var feed = new RSS({
-    title: 'Docker Hub Images: ' + repo.user + '/' + repo.name,
+    title: repo.user + '/' + repo.name + ' | Docker Hub Images',
     description: repo.description,
     site_url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
     image_url: user.gravatar_url
