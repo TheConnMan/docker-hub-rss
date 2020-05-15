@@ -108,7 +108,7 @@ function formatRSS(repo, user, images) {
   images.forEach(image => {
     feed.item({
       title: repo.user + '/' + repo.name + ':' + image.name,
-      url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
+      url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name + '/tags?name=' + image.name,
       guid: image.id + '-' + new Date(image.last_updated).getTime(),
       date: new Date(image.last_updated)
     });
