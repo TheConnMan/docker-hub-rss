@@ -100,7 +100,7 @@ app.listen(3000, function () {
 
 function formatRSS(repo, user, images) {
   var feed = new RSS({
-    title: 'Docker Hub Images: ' + repo.user + '/' + repo.name,
+    title: repo.user + '/' + repo.name + ' | Docker Hub Images',
     description: repo.description,
     site_url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
     image_url: user.gravatar_url
@@ -108,7 +108,7 @@ function formatRSS(repo, user, images) {
   images.forEach(image => {
     feed.item({
       title: repo.user + '/' + repo.name + ':' + image.name,
-      url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name,
+      url: 'https://hub.docker.com/r/' + repo.user + '/' + repo.name + '/tags?name=' + image.name,
       guid: image.id + '-' + new Date(image.last_updated).getTime(),
       date: new Date(image.last_updated)
     });
