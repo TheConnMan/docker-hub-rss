@@ -2,11 +2,10 @@
   "name": "docker-hub-rss",
   "version": "0.3.2",
   "description": "RSS feed for Docker Hub images",
-  "main": "index.js",
+  "author": "TheConnMan",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "TheConnMan",
   "repository": {
     "type": "git",
     "url": "git://github.com/TheConnMan/docker-hub-rss.git"
@@ -14,10 +13,9 @@
   "license": "MIT",
   "dependencies": {
     "docker-hub-api": "^0.8.0",
-    "express": "^4.15.2",
+    "express": "^4.17.1",
     "fluent-logger": "github:theconnman/fluent-logger-node",
     "log4js": "^1.1.1",
-    "rss": "^1.2.2",
-    "statsd-client": "^0.4.0"
+    "rss": "^1.2.2"
   }
 }

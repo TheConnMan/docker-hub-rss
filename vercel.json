@@ -1,0 +1,22 @@
+{
+  "public": true,
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "(/r)?/:username/:repository(.atom)?",
+      "destination": "/api/[username]/[repository].js"
+    },
+    {
+      "source": "/r/:username/:repository",
+      "destination": "/api/[username]/[repository].js"
+    },
+    {
+      "source": "/:username/:repository.atom",
+      "destination": "/api/[username]/[repository].js"
+    },
+    {
+      "source": "/:username/:repository",
+      "destination": "/api/[username]/[repository].js"
+    }
+  ]
+}
