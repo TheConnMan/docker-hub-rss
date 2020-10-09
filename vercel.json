@@ -18,5 +18,10 @@
       "source": "/:username/:repository",
       "destination": "/api/[username]/[repository].js"
     }
-  ]
+  ],
+  "functions": {
+    "api/[username]/[repository].js": {
+      "memory": 256
+    }
+  }
 }
