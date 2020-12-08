@@ -9,7 +9,7 @@ services:
 
 script:
   - docker build -t theconnman/docker-hub-rss .
-  - docker build -t theconnman/docker-hub-rss -f Dockerfile-armv7 .
+  - docker build -t theconnman/docker-hub-rss:latest-armv7 -f Dockerfile-armv7 .
 
 after_success:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
