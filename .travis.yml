@@ -17,10 +17,13 @@ after_success:
     if [ "$TRAVIS_BRANCH" == "master" ]; then
       docker tag theconnman/docker-hub-rss theconnman/docker-hub-rss:$VERSION;
       docker push theconnman/docker-hub-rss:latest;
+      docker push theconnman/docker-hub-rss:latest-armv7;
       docker push theconnman/docker-hub-rss:$VERSION;
     elif [ "$TRAVIS_BRANCH" == "dev" ]; then
       sed -i "s/$VERSION/$VERSION-dev/g" package.json;
       docker build -t theconnman/docker-hub-rss .;
+      docker build -t theconnman/docker-hub-rss:latest-armv7 -f Dockerfile-armv7 .;
       docker tag theconnman/docker-hub-rss theconnman/docker-hub-rss:latest-dev;
+      docker push theconnman/docker-hub-rss:latest-armv7-dev;
       docker push theconnman/docker-hub-rss:latest-dev;
     fi
