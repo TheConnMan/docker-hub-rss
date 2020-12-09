@@ -22,7 +22,7 @@ after_success:
     elif [ "$TRAVIS_BRANCH" == "dev" ]; then
       sed -i "s/$VERSION/$VERSION-dev/g" package.json;
       docker build -t theconnman/docker-hub-rss .;
-      docker build -t theconnman/docker-hub-rss:latest-armv7 -f Dockerfile-armv7 .;
+      docker build -t theconnman/docker-hub-rss:latest-armv7-dev -f Dockerfile-armv7 .;
       docker tag theconnman/docker-hub-rss theconnman/docker-hub-rss:latest-dev;
       docker push theconnman/docker-hub-rss:latest-armv7-dev;
       docker push theconnman/docker-hub-rss:latest-dev;
