@@ -19,15 +19,14 @@ To use point an RSS feed reader to `http://<url>:3000/<docker-hub-user>/<docker-
 To develop locally run the following:
 
 ```bash
+npm i -g vercel
 git clone https://github.com/TheConnMan/docker-hub-rss.git
 cd docker-hub-rss
 yarn install
-yarn start
+vercel dev
 ```
 
 ## Environment Variables
 
 - **FLUENTD_HOST** (Optional) Fluent host for logging
 - **FLUENTD_TAGS** (Optional) Add FluentD context tags (format is tag:value,tag2:value2)
-- STATSD_HOST (default: localhost) - StatsD hostname
-- STATSD_TAGS (Optional) - StatsD tags
