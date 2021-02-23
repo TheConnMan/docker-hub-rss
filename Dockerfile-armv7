@@ -1,8 +1,10 @@
 FROM arm32v7/node:12-alpine
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git && mkdir /app && chown nobody:nogroup /app
 
 WORKDIR /app
+
+USER nobody
 
 COPY yarn.lock /app
 COPY package.json /app
