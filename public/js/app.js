@@ -11,10 +11,10 @@ app.controller('controller', function($scope, $http, $location) {
   $scope.fetchFeed = function() {
     $scope.loading = true;
     $scope.error = false;
-    $scope.url = '';
+    var baseUrl = window.location.origin + window.location.pathname.replace(/\/+$/, '');
     $http({
-      url: '/' + $scope.user + '/' + $scope.repo + '.atom',
-      urlAlt: '/r/' + $scope.user + '/' + $scope.repo,
+      url: baseUrl + '/' + $scope.user + '/' + $scope.repo + '.atom',
+      urlAlt: baseUrl + '/r/' + $scope.user + '/' + $scope.repo,
       params: {
         include: $scope.include,
         exclude: $scope.exclude,
@@ -35,8 +35,8 @@ app.controller('controller', function($scope, $http, $location) {
         }
         return array;
       }, []);
-      $scope.url = window.location.origin + config.url + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
-      $scope.urlAlt = window.location.origin + config.urlAlt + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
+      $scope.url = config.url + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
+      $scope.urlAlt = config.urlAlt + (queryParams.length > 0 ? '?' + queryParams.join('&') : '');
       $scope.loading = false;
       $location.search({
         user: $scope.user,
