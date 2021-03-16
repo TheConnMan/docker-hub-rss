@@ -24,7 +24,7 @@ app.use(express.static('public'));
 
 
 app.get('/r/:username/:repository', function (req, res) {
-  res.redirect(`/${req.params.username}/${req.params.repository}.atom`);
+  res.redirect(`../../${req.params.username}/${req.params.repository}.atom`);
 });
 
 app.get('/:username/:repository.atom', function (req, res) {
