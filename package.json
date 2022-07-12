@@ -1,6 +1,6 @@
 {
   "name": "docker-hub-rss",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "RSS feed for Docker Hub images",
   "author": "TheConnMan",
   "scripts": {
