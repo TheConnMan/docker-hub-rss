@@ -19,6 +19,7 @@
     "rss": "^1.2.2"
   },
   "resolutions": {
+    "debug": "2.6.9",
     "lodash": "4.17.21"
   }
 }
