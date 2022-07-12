@@ -17,5 +17,8 @@
     "fluent-logger": "github:theconnman/fluent-logger-node",
     "log4js": "^1.1.1",
     "rss": "^1.2.2"
+  },
+  "resolutions": {
+    "lodash": "4.17.21"
   }
 }
