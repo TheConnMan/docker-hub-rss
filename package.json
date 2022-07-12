@@ -15,7 +15,7 @@
     "docker-hub-api": "^0.8.0",
     "express": "^4.17.1",
     "fluent-logger": "github:theconnman/fluent-logger-node",
-    "log4js": "^1.1.1",
+    "log4js": "^6.4.0",
     "rss": "^1.2.2"
   }
 }
