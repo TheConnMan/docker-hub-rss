@@ -41,7 +41,7 @@ async function getTagsRecursive(username, repository, page, tags) {
   const tagsPage = await dockerHubAPI.tags(username, repository, {
     page
   });
-  if ("length" in (tagsPage.results || tagsPage) === false || (tagsPage.results || tagsPage).length === 0) {
+  if ("length" in (tagsPage.results || tagsPage) === false || (tagsPage.results || tagsPage).length === 0 || tags.length >= process.env.TAGS_FETCH_LIMIT) {
     return Promise.resolve(tags);
   }
   return getTagsRecursive(username, repository, page + 1, tags.concat((tagsPage.results || tagsPage)));
