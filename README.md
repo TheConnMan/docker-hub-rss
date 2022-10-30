@@ -12,7 +12,7 @@ Docker Hub doesn't provide notifications for new image releases, so **Docker Hub
 
 Run with Docker by executing: `docker run -d -p 3000:3000 --name=docker-hub-rss theconnman/docker-hub-rss:latest`
 
-To use point an RSS feed reader to `http://<url>:3000/<docker-hub-user>/<docker-hub-repo>.atom`. The easiest way to create a publically accessible endpoint for an RSS reader is to use [Localtunnel](https://localtunnel.github.io/) to proxy a public location to your local **Docker Hub RSS** instance.
+To use point an RSS feed reader to `http://<url>:3000/<docker-hub-user>/<docker-hub-repo>.atom`. The easiest way to create a publicly accessible endpoint for an RSS reader is to use [Localtunnel](https://localtunnel.github.io/) to proxy a public location to your local **Docker Hub RSS** instance.
 
 ## Local Development
 
