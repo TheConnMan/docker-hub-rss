@@ -31,3 +31,4 @@ vercel dev
 - **FLUENTD_HOST** (Optional) Fluent host for logging
 - **FLUENTD_TAGS** (Optional) Add FluentD context tags (format is tag:value,tag2:value2)
 - **TAGS_FETCH_LIMIT** (Optional) Fetch only the given number of tags (before being filtered). Useful for reducing traffic and avoiding possible time-outs.
+- **PORT** (Default: 3000) Port to run the service on

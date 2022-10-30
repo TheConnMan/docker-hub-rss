@@ -33,10 +33,7 @@ app.get('/:username/:repository.atom', function (req, res) {
   vercel(req, res);
 });
 
-var port = 3000
-if (process.env.PORT) {
-  port = parseInt(process.env.PORT);
-}
+var port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 app.listen(port, function () {
   console.log(`Docker RSS Feed listening on port ${port}!`);
