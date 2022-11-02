@@ -20,6 +20,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -36,11 +42,11 @@ jobs:
           echo "REPO_OWNER=${REPO_OWNER,,}" >> ${GITHUB_ENV}
 
       # Set the version variable
-      # Trim the first 10 characters, which are "refs/tags/"
+      # Trim the first 11 characters, which are "refs/tags/v"
       - name: Set VERSION
         if: startsWith( github.ref, 'refs/tags/v')
         run: |
-          VERSION=${GITHUB_REF:10}
+          VERSION=${GITHUB_REF:11}
           echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
 
       - name: Docker build and push
@@ -50,6 +56,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           tags: |
+            theconnman/docker-hub-rss:edge
             ghcr.io/${{ env.REPO_OWNER }}/docker-hub-rss:edge
           push: true
 
@@ -62,6 +69,8 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           tags: |
+            theconnman/docker-hub-rss:latest
+            theconnman/docker-hub-rss:${{ env.VERSION }}
             ghcr.io/${{ env.REPO_OWNER }}/docker-hub-rss:latest
             ghcr.io/${{ env.REPO_OWNER }}/docker-hub-rss:${{ env.VERSION }}
           push: true
