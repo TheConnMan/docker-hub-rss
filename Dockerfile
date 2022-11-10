@@ -6,11 +6,11 @@ WORKDIR /app
 
 USER nobody
 
-COPY yarn.lock /app
-COPY package.json /app
+COPY --chown=nobody:nogroup yarn.lock /app
+COPY --chown=nobody:nogroup package.json /app
 RUN yarn install
 
-COPY . /app
+COPY --chown=nobody:nogroup . /app
 
 EXPOSE 3000
 
