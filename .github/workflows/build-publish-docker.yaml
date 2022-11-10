@@ -1,0 +1,77 @@
+name: Build rss-bot
+
+on:
+  push:
+    branches: 
+      - master
+      - main
+      - dev
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build docker-hub-rss
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      # Lowercase the repo owner
+      - name: Set REPO_OWNER
+        run: |
+          REPO_OWNER=${{ github.repository_owner }}
+          echo "REPO_OWNER=${REPO_OWNER,,}" >> ${GITHUB_ENV}
+
+      # Set the version variable
+      # Trim the first 11 characters, which are "refs/tags/v"
+      - name: Set VERSION
+        if: startsWith( github.ref, 'refs/tags/v')
+        run: |
+          VERSION=${GITHUB_REF:11}
+          echo "VERSION=${VERSION}" >> ${GITHUB_ENV}
+
+      - name: Docker build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          tags: |
+            theconnman/docker-hub-rss:latest-dev
+            ghcr.io/${{ env.REPO_OWNER }}/docker-hub-rss:latest-dev
+          push: true
+
+      # Uses cache instead of rebuilding
+      - name: Docker build and push version
+        if: startsWith( github.ref, 'refs/tags/v')
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          tags: |
+            theconnman/docker-hub-rss:latest
+            theconnman/docker-hub-rss:${{ env.VERSION }}
+            ghcr.io/${{ env.REPO_OWNER }}/docker-hub-rss:latest
+            ghcr.io/${{ env.REPO_OWNER }}/docker-hub-rss:${{ env.VERSION }}
+          push: true
