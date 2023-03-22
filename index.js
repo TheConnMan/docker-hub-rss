@@ -1,4 +1,5 @@
 var vercel = require('./api/[username]/[repository]');
+var info = require('./api/info');
 
 var log4js = require('log4js');
 
@@ -22,6 +23,10 @@ var app = express();
 
 app.use(express.static('public'));
 
+
+app.get('/info', function (req, res) {
+  info(req, res);
+});
 
 app.get('/r/:username/:repository', function (req, res) {
   res.redirect(`../../${req.params.username}/${req.params.repository}.atom`);
