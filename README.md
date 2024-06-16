@@ -1,6 +1,6 @@
 # Docker Hub RSS
 
-[![Build Status](https://travis-ci.org/TheConnMan/docker-hub-rss.svg?branch=master)](https://travis-ci.org/TheConnMan/docker-hub-rss) [![Docker Pulls](https://img.shields.io/docker/pulls/theconnman/docker-hub-rss.svg)](https://hub.docker.com/r/theconnman/docker-hub-rss/)
+[![Build Status](https://github.com/TheConnMan/docker-hub-rss/actions/workflows/build-publish-docker.yaml/badge.svg?branch=master)](https://github.com/TheConnMan/docker-hub-rss) [![Docker Pulls](https://img.shields.io/docker/pulls/theconnman/docker-hub-rss.svg)](https://hub.docker.com/r/theconnman/docker-hub-rss/)
 
 RSS feed for Docker Hub images
 
