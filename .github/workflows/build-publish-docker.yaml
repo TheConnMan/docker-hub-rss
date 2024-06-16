@@ -55,7 +55,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           tags: |
             theconnman/docker-hub-rss:latest-dev
             ghcr.io/${{ env.REPO_OWNER }}/docker-hub-rss:latest-dev
@@ -68,7 +68,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64
           tags: |
             theconnman/docker-hub-rss:latest
             theconnman/docker-hub-rss:${{ env.VERSION }}
