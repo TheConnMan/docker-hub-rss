@@ -29,7 +29,9 @@ app.get('/info', function (req, res) {
 });
 
 app.get('/r/:username/:repository', function (req, res) {
-  res.redirect(`../../${req.params.username}/${req.params.repository}.atom`);
+  req.query.username = req.params.username;
+  req.query.repository = req.params.repository;
+  vercel(req, res);
 });
 
 app.get('/:username/:repository.atom', function (req, res) {
