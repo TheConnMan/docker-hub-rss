@@ -54,6 +54,51 @@ function mockFeed({ userResponse = user } = {}) {
     .reply(200, tagsEmpty);
 }
 
+// Same full-build interceptors as mockFeed, but every Docker Hub call must
+// carry `Authorization: Bearer test-jwt`, and a single login POST (matched on
+// its exact credential body) hands back that JWT. Header matchers mean a call
+// missing the Bearer token finds no interceptor and throws (net connect is
+// disabled), so a passing test proves auth was threaded onto every request; the
+// single-shot login interceptor proves login ran exactly once per feed build.
+function mockFeedAuthed({ username = 'dhuser', token = 'dhtoken' } = {}) {
+  const client = fetchMock.get(HOST);
+  client
+    .intercept({
+      path: '/v2/users/login',
+      method: 'POST',
+      body: JSON.stringify({ username, password: token }),
+    })
+    .reply(200, { token: 'test-jwt' });
+  client
+    .intercept({
+      path: '/v2/repositories/acme/widget/',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, repository);
+  client
+    .intercept({
+      path: '/v2/users/acme/',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, user);
+  client
+    .intercept({
+      path: '/v2/repositories/acme/widget/tags?page_size=100&page=1',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, tagsPage1);
+  client
+    .intercept({
+      path: '/v2/repositories/acme/widget/tags?page_size=100&page=2',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, tagsEmpty);
+}
+
 beforeAll(() => {
   fetchMock.activate();
   fetchMock.disableNetConnect();
@@ -366,6 +411,68 @@ describe('Docker Hub error-path parity', () => {
     );
     await waitOnExecutionContext(ctx);
     expect(res.status).toBe(500);
+    fetchMock.assertNoPendingInterceptors();
+  });
+});
+
+describe('Docker Hub authentication', () => {
+  it('logs in once and sends Bearer auth on every Docker Hub call', async () => {
+    mockFeedAuthed();
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/widget.atom'),
+      { ...env, DOCKERHUB_USERNAME: 'dhuser', DOCKERHUB_TOKEN: 'dhtoken' },
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    // Authed build reproduces the golden feed byte-for-byte.
+    expect(normalize(body)).toBe(normalize(goldenFeed));
+    // Login + every authed interceptor consumed exactly once (login once).
+    fetchMock.assertNoPendingInterceptors();
+  });
+
+  it('falls back to anonymous requests when creds are absent', async () => {
+    // mockFeed registers NO login interceptor: if the worker tried to log in,
+    // that POST would find no interceptor and throw with net connect disabled.
+    mockFeed();
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/widget.atom'),
+      env,
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(normalize(body)).toBe(normalize(goldenFeed));
+    fetchMock.assertNoPendingInterceptors();
+  });
+});
+
+describe('Docker Hub rate-limit handling', () => {
+  it('surfaces a 429 rate-limit as a 500, not a 200 with blank fields', async () => {
+    // The exact edge failure: an anonymous repo call is rate-limited with
+    // {"detail":"Rate limit exceeded","error":false} at HTTP 429. The old
+    // body-only check treated error===false as success and produced a 200 with
+    // undefined fields; the status check must now surface it as a 500.
+    const client = fetchMock.get(HOST);
+    client
+      .intercept({ path: '/v2/repositories/acme/widget/', method: 'GET' })
+      .reply(429, { detail: 'Rate limit exceeded', error: false });
+
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/widget.atom'),
+      env,
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(500);
+    const body = await res.text();
+    expect(body).toContain('429');
+    expect(body).toContain('Rate limit exceeded');
     fetchMock.assertNoPendingInterceptors();
   });
 });

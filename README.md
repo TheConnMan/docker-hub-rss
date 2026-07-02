@@ -50,7 +50,16 @@ yarn test           # vitest suite (runs in the Workers runtime)
 wrangler deploy     # deploy (requires `wrangler login`)
 ```
 
-The production route is a custom domain in `wrangler.toml` (`docker-hub-rss.theconnman.com`). On the free tier, `TAGS_FETCH_LIMIT` (a `wrangler.toml` var, default `100`) keeps each request to ~3 Docker Hub subrequests, under the 50-per-request cap.
+The Worker deploys to `*.workers.dev`. On the free tier, `TAGS_FETCH_LIMIT` (a `wrangler.toml` var, default `100`) keeps each request to ~3 Docker Hub subrequests, under the 50-per-request cap.
+
+The deployed Worker requires two secrets — a Docker Hub username and a read-only access token — because Docker Hub rate-limits Cloudflare's shared egress IPs and returns HTTP 429 to anonymous requests; authenticating gives the feed a per-account limit instead:
+
+```bash
+npx wrangler secret put DOCKERHUB_USERNAME
+npx wrangler secret put DOCKERHUB_TOKEN
+```
+
+When the secrets are absent (e.g. `wrangler dev` or the test suite), the Worker falls back to anonymous requests.
 
 ## Environment Variables
 
