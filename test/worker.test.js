@@ -54,6 +54,51 @@ function mockFeed({ userResponse = user } = {}) {
     .reply(200, tagsEmpty);
 }
 
+// Same full-build interceptors as mockFeed, but every Docker Hub call must
+// carry `Authorization: Bearer test-jwt`, and a single login POST (matched on
+// its exact credential body) hands back that JWT. Header matchers mean a call
+// missing the Bearer token finds no interceptor and throws (net connect is
+// disabled), so a passing test proves auth was threaded onto every request; the
+// single-shot login interceptor proves login ran exactly once per feed build.
+function mockFeedAuthed({ username = 'dhuser', token = 'dhtoken' } = {}) {
+  const client = fetchMock.get(HOST);
+  client
+    .intercept({
+      path: '/v2/users/login',
+      method: 'POST',
+      body: JSON.stringify({ username, password: token }),
+    })
+    .reply(200, { token: 'test-jwt' });
+  client
+    .intercept({
+      path: '/v2/repositories/acme/widget/',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, repository);
+  client
+    .intercept({
+      path: '/v2/users/acme/',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, user);
+  client
+    .intercept({
+      path: '/v2/repositories/acme/widget/tags?page_size=100&page=1',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, tagsPage1);
+  client
+    .intercept({
+      path: '/v2/repositories/acme/widget/tags?page_size=100&page=2',
+      method: 'GET',
+      headers: { authorization: 'Bearer test-jwt' },
+    })
+    .reply(200, tagsEmpty);
+}
+
 beforeAll(() => {
   fetchMock.activate();
   fetchMock.disableNetConnect();
@@ -370,16 +415,125 @@ describe('Docker Hub error-path parity', () => {
   });
 });
 
+describe('Docker Hub authentication', () => {
+  it('logs in once and sends Bearer auth on every Docker Hub call', async () => {
+    mockFeedAuthed();
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/widget.atom'),
+      { ...env, DOCKERHUB_USERNAME: 'dhuser', DOCKERHUB_TOKEN: 'dhtoken' },
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    // Authed build reproduces the golden feed byte-for-byte.
+    expect(normalize(body)).toBe(normalize(goldenFeed));
+    // Login + every authed interceptor consumed exactly once (login once).
+    fetchMock.assertNoPendingInterceptors();
+  });
+
+  it('falls back to anonymous requests when creds are absent', async () => {
+    // mockFeed registers NO login interceptor: if the worker tried to log in,
+    // that POST would find no interceptor and throw with net connect disabled.
+    mockFeed();
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/widget.atom'),
+      env,
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(normalize(body)).toBe(normalize(goldenFeed));
+    fetchMock.assertNoPendingInterceptors();
+  });
+});
+
+describe('Docker Hub rate-limit handling', () => {
+  it('surfaces a 429 rate-limit as a 500, not a 200 with blank fields', async () => {
+    // The exact edge failure: an anonymous repo call is rate-limited with
+    // {"detail":"Rate limit exceeded","error":false} at HTTP 429. The old
+    // body-only check treated error===false as success and produced a 200 with
+    // undefined fields; the status check must now surface it as a 500.
+    const client = fetchMock.get(HOST);
+    client
+      .intercept({ path: '/v2/repositories/acme/widget/', method: 'GET' })
+      .reply(429, { detail: 'Rate limit exceeded', error: false });
+
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/widget.atom'),
+      env,
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(500);
+    const body = await res.text();
+    expect(body).toContain('429');
+    expect(body).toContain('Rate limit exceeded');
+    fetchMock.assertNoPendingInterceptors();
+  });
+});
+
+describe('private repository guard', () => {
+  it('refuses to serve a private repo even when authenticated', async () => {
+    // The shared service-account token could have private-repo read access;
+    // without a guard, /owner/private.atom would turn an anonymous 404 into a
+    // public feed. The repo lookup must be rejected on is_private before any
+    // tags are fetched, so no user/tags interceptors are registered here: the
+    // guard must throw on the repo response alone (surfaced as a 500).
+    const client = fetchMock.get(HOST);
+    client
+      .intercept({
+        path: '/v2/users/login',
+        method: 'POST',
+        body: JSON.stringify({ username: 'dhuser', password: 'dhtoken' }),
+      })
+      .reply(200, { token: 'test-jwt' });
+    client
+      .intercept({
+        path: '/v2/repositories/acme/secret/',
+        method: 'GET',
+        headers: { authorization: 'Bearer test-jwt' },
+      })
+      .reply(200, {
+        user: 'acme',
+        name: 'secret',
+        description: 'hush',
+        is_private: true,
+      });
+
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/secret.atom'),
+      { ...env, DOCKERHUB_USERNAME: 'dhuser', DOCKERHUB_TOKEN: 'dhtoken' },
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(500);
+    const body = await res.text();
+    // Message names the private guard, proving it fired (not an incidental
+    // fetch failure on an unregistered user/tags call).
+    expect(body).toContain('private');
+    fetchMock.assertNoPendingInterceptors();
+  });
+});
+
 describe('underscore -> library mapping', () => {
   it('maps _ to library for repo + tags but keeps _ for the user', async () => {
     const client = fetchMock.get(HOST);
     client
       .intercept({ path: '/v2/repositories/library/nginx/', method: 'GET' })
       .reply(200, { user: 'library', name: 'nginx', description: 'x' });
-    // user path uses the RAW lowercased `_`, NOT library
+    // user path uses the RAW lowercased `_`, NOT library. Docker Hub returns a
+    // real HTTP 404 for `/v2/users/_/` (there is no `_` account), so the user
+    // lookup must degrade gracefully (omit the optional image) and still build
+    // the feed rather than 500 -- this is the documented official-image route.
     client
       .intercept({ path: '/v2/users/_/', method: 'GET' })
-      .reply(200, { gravatar_url: '' });
+      .reply(404, { message: 'httperror 404: object not found', errinfo: {} });
     client
       .intercept({
         path: '/v2/repositories/library/nginx/tags?page_size=100&page=1',
@@ -410,6 +564,8 @@ describe('underscore -> library mapping', () => {
     expect(res.status).toBe(200);
     const body = await res.text();
     expect(body).toContain('library/nginx | Docker Hub Images');
+    // The 404 user lookup yields no gravatar, so the <image> block is omitted.
+    expect(body).not.toContain('<image>');
     fetchMock.assertNoPendingInterceptors();
   });
 });

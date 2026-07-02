@@ -7,7 +7,3 @@ directory = "./public"
 
 [vars]
 TAGS_FETCH_LIMIT = "100"
-
-[[routes]]
-pattern = "docker-hub-rss.theconnman.com"
-custom_domain = true

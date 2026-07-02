@@ -50,6 +50,8 @@ async function handleFeed(request, url, env, ctx, username, repository) {
         excludeRegex: url.searchParams.get('excludeRegex'),
       },
       tagsFetchLimit: env.TAGS_FETCH_LIMIT,
+      // Optional Docker Hub auth (Worker secrets). Absent -> anonymous.
+      auth: { username: env.DOCKERHUB_USERNAME, token: env.DOCKERHUB_TOKEN },
     });
     const response = new Response(xml, {
       headers: {
