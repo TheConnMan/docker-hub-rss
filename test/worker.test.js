@@ -483,10 +483,13 @@ describe('underscore -> library mapping', () => {
     client
       .intercept({ path: '/v2/repositories/library/nginx/', method: 'GET' })
       .reply(200, { user: 'library', name: 'nginx', description: 'x' });
-    // user path uses the RAW lowercased `_`, NOT library
+    // user path uses the RAW lowercased `_`, NOT library. Docker Hub returns a
+    // real HTTP 404 for `/v2/users/_/` (there is no `_` account), so the user
+    // lookup must degrade gracefully (omit the optional image) and still build
+    // the feed rather than 500 -- this is the documented official-image route.
     client
       .intercept({ path: '/v2/users/_/', method: 'GET' })
-      .reply(200, { gravatar_url: '' });
+      .reply(404, { message: 'httperror 404: object not found', errinfo: {} });
     client
       .intercept({
         path: '/v2/repositories/library/nginx/tags?page_size=100&page=1',
@@ -517,6 +520,8 @@ describe('underscore -> library mapping', () => {
     expect(res.status).toBe(200);
     const body = await res.text();
     expect(body).toContain('library/nginx | Docker Hub Images');
+    // The 404 user lookup yields no gravatar, so the <image> block is omitted.
+    expect(body).not.toContain('<image>');
     fetchMock.assertNoPendingInterceptors();
   });
 });
