@@ -477,6 +477,50 @@ describe('Docker Hub rate-limit handling', () => {
   });
 });
 
+describe('private repository guard', () => {
+  it('refuses to serve a private repo even when authenticated', async () => {
+    // The shared service-account token could have private-repo read access;
+    // without a guard, /owner/private.atom would turn an anonymous 404 into a
+    // public feed. The repo lookup must be rejected on is_private before any
+    // tags are fetched, so no user/tags interceptors are registered here: the
+    // guard must throw on the repo response alone (surfaced as a 500).
+    const client = fetchMock.get(HOST);
+    client
+      .intercept({
+        path: '/v2/users/login',
+        method: 'POST',
+        body: JSON.stringify({ username: 'dhuser', password: 'dhtoken' }),
+      })
+      .reply(200, { token: 'test-jwt' });
+    client
+      .intercept({
+        path: '/v2/repositories/acme/secret/',
+        method: 'GET',
+        headers: { authorization: 'Bearer test-jwt' },
+      })
+      .reply(200, {
+        user: 'acme',
+        name: 'secret',
+        description: 'hush',
+        is_private: true,
+      });
+
+    const ctx = createExecutionContext();
+    const res = await worker.fetch(
+      new Request('https://example.com/acme/secret.atom'),
+      { ...env, DOCKERHUB_USERNAME: 'dhuser', DOCKERHUB_TOKEN: 'dhtoken' },
+      ctx,
+    );
+    await waitOnExecutionContext(ctx);
+    expect(res.status).toBe(500);
+    const body = await res.text();
+    // Message names the private guard, proving it fired (not an incidental
+    // fetch failure on an unregistered user/tags call).
+    expect(body).toContain('private');
+    fetchMock.assertNoPendingInterceptors();
+  });
+});
+
 describe('underscore -> library mapping', () => {
   it('maps _ to library for repo + tags but keeps _ for the user', async () => {
     const client = fetchMock.get(HOST);
