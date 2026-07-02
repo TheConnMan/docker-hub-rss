@@ -8,7 +8,7 @@ USER nobody
 
 COPY --chown=nobody:nogroup yarn.lock /app
 COPY --chown=nobody:nogroup package.json /app
-RUN yarn install
+RUN yarn install --production
 
 COPY --chown=nobody:nogroup . /app
 
