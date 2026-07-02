@@ -1,0 +1,13 @@
+name = "docker-hub-rss"
+main = "src/worker.js"
+compatibility_date = "2024-09-23"
+
+[assets]
+directory = "./public"
+
+[vars]
+TAGS_FETCH_LIMIT = "100"
+
+[[routes]]
+pattern = "docker-hub-rss.theconnman.com"
+custom_domain = true
