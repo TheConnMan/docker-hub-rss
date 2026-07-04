@@ -1,2 +1,8 @@
 node_modules/
 .vercel
+.git
+.wrangler/
+.cache/
+.yarn-cache*
+coverage/
+dist/
