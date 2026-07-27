@@ -16,6 +16,8 @@ Point an RSS feed reader at `/<docker-hub-user>/<docker-hub-repo>.atom`. The bar
 
 **Docker Hub RSS** runs four ways. The Local, Docker, and Vercel paths share the Express app (`index.js`, `api/`); Cloudflare runs the equivalent Worker (`src/worker.js`).
 
+The Cloudflare Worker is the recommended way to host a public instance: it needs no server, stays within the Workers free tier for typical feed-reader traffic, and authenticates to Docker Hub so it avoids the anonymous rate limits described below.
+
 ### Local (Node)
 
 ```bash
